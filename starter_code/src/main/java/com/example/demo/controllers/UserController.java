@@ -37,6 +37,30 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	public UserRepository getUserRepository() {
+		return userRepository;
+	}
+
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	public CartRepository getCartRepository() {
+		return cartRepository;
+	}
+
+	public void setCartRepository(CartRepository cartRepository) {
+		this.cartRepository = cartRepository;
+	}
+
+	public BCryptPasswordEncoder getbCryptPasswordEncoder() {
+		return bCryptPasswordEncoder;
+	}
+
+	public void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+	}
+
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		Optional<User> found = userRepository.findById(id);
