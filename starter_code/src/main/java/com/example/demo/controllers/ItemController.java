@@ -16,7 +16,7 @@ import com.example.demo.model.persistence.Item;
 import com.example.demo.model.persistence.repositories.ItemRepository;
 
 @RestController
-@RequestMapping("/ecommerce/api/item")
+@RequestMapping("/api/item")
 public class ItemController {
 
 	private Logger logger = LoggerFactory.getLogger(ItemController.class);
