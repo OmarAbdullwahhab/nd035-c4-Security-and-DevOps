@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.TestUtils;
 import com.example.demo.controllers.UserController;
+import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
@@ -18,12 +19,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import javax.validation.constraints.AssertTrue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
 
 
@@ -47,14 +50,31 @@ public class UserControllerTest {
         TestUtils.injectObjects(userController,"userRepository", userRepository);
         TestUtils.injectObjects(userController,"cartRepository", cartRepository);
         TestUtils.injectObjects(userController,"bCryptPasswordEncoder", bCryptPasswordEncoder);
-        this.createUser();
+        when(userRepository.findByUsername("tester")).thenReturn(sampleUser());
+        when(userRepository.findById(1l)).thenReturn(Optional.of(sampleUser()));
+        when(userRepository.save(sampleUser())).thenReturn(sampleUser());
+        when(cartRepository.findByUser(sampleUser())).thenReturn(sampleUser().getCart());
+    }
+
+    private User sampleUser()
+    {
+        User user = new User();
+        user.setUsername("tester");
+        user.setPassword("Tester123**");
+        user.setId(1);
+        Cart cart = new Cart();
+        cart.setId(1l);
+        cart.setUser(user);
+        cart.setTotal(BigDecimal.valueOf(1500.50));
+        user.setCart(cart);
+        return user;
     }
 
     @Test
-    public void createUser()
+    public void testCreateUser()
     {
-        this.userName = "tester";
-        this.password = "Tester123**";
+        this.userName = sampleUser().getUsername();
+        this.password = sampleUser().getPassword();
         CreateUserRequest request = new CreateUserRequest();
         request.setUsername(this.userName);
         request.setPassword(this.password);
@@ -64,15 +84,45 @@ public class UserControllerTest {
         {
 
             User u = found.getBody();
-            this.userId = u.getId();
+            this.userId = sampleUser().getId();
             System.out.println("User found with id -> " + this.userId);
         }
         else {
             ResponseEntity<User> created = userController.createUser(request);
             User u = created.getBody();
             this.userId = u.getId();
+            System.out.println("User created with id -> " + this.userId);
             assertEquals(u.getUsername(),this.userName);
         }
+    }
+    @Test
+    public void testCreateUserBadRequest()
+    {
+        this.userName = "baduser";
+        this.password = "1";
+        CreateUserRequest request = new CreateUserRequest();
+        request.setUsername(this.userName);
+        request.setPassword(this.password);
+        request.setConfirmPassword(this.password);
+        ResponseEntity<User> found = this.userController.createUser(request);
+        assertFalse(found.getStatusCodeValue() == 200);
+
+    }
+    @Test
+    public void testFindById()
+    {
+        ResponseEntity<User> found = this.userController.findById(1l);
+        assertNotNull(found);
+        assertEquals(sampleUser().getId(),found.getBody().getId());
+    }
+
+    @Test
+    public void testFindByUsername()
+    {
+        ResponseEntity<User> found = this.userController.findByUserName("tester");
+        assertNotNull(found);
+        assertEquals(sampleUser().getId(), found.getBody().getId());
+
     }
 
 }
