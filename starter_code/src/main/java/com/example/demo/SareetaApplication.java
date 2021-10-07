@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -14,7 +15,7 @@ import org.springframework.web.WebApplicationInitializer;
 @EnableJpaRepositories("com.example.demo.model.persistence.repositories")
 @EntityScan("com.example.demo.model.persistence")
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-public class SareetaApplication extends SpringBootServletInitializer implements WebApplicationInitializer {
+public class SareetaApplication extends SpringBootServletInitializer  {
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder()
@@ -27,6 +28,6 @@ public class SareetaApplication extends SpringBootServletInitializer implements 
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return builder.sources(SareetaApplication.class);
+		return builder.sources(SareetaApplication.class).bannerMode(Banner.Mode.OFF);
 	}
 }
